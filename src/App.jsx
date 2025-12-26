@@ -1,10 +1,12 @@
 import React from 'react'
-import Navbar from './components/Navbar.jsx'
+import NavbarLog from './components/NavbarLog.jsx'
+import NavbarSt from './components/NavbarSt.jsx'
 
 const App = () => {
     return (
-        <div className='max-w-360 w-full mx-auto'>
-            <Navbar />
+        <div className=''>
+            <NavbarSt />
+            sioiaj
         </div>
     )
 }
