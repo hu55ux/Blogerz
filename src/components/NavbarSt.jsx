@@ -132,11 +132,6 @@ const NavbarSt = () => {
                 </button>
 
             </div>
-            <div className='w-300 h-31 bg-gray-600'>
-
-            </div>
-
-
         </div>
     )
 }
