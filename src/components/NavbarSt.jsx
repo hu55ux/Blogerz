@@ -15,23 +15,23 @@ const NavbarSt = () => {
 
     return (
         <div
-            className={`w-full h-81 flex flex-col items-center justify-start px-4 transition-colors duration-500
+            className={`w-full h-81 flex flex-col items-center justify-start px-4 transition-all duration-500
         ${isDarkmodeActive ? 'bg-gray-900' : 'bg-white'}`}
         >
             <div
-                className={`w-300 h-9 py-8 font-light flex items-center rounded-md text-lg transition-colors duration-500
+                className={`w-full max-w-360 mx-auto  h-9 py-8 font-light flex items-center rounded-md text-lg transition-all duration-500
           ${isDarkmodeActive ? 'bg-gray-900 text-gray-100' : 'bg-white text-gray-900'}`}
             >
                 <button onClick={() => navigate('/')}
-                    className={`font-medium transition-all duration-300 hover:-translate-y-0.5
+                    className={`font-medium transition-all duration-500 hover:-translate-y-0.5
     ${isDarkmodeActive
                             ? 'text-gray-200 hover:text-indigo-400'
                             : 'text-gray-700 hover:text-indigo-500'
                         }`}
                 >
                     <div
-                        className={`pl-2 pr-10 flex items-center border-r-2 mr-6 transition-colors duration-500
-      ${isDarkmodeActive ? 'border-gray-600' : 'border-gray-300'}`}
+                        className={`pl-2 pr-10 flex items-center border-r-2 mr-6 transition-all duration-500
+      ${isDarkmodeActive ? 'border-gray-600' : 'border-gray-500'}`}
                     >
                         <img src={isDarkmodeActive ? UnionWhite : Union} alt="Union Logo" className="w-6 h-6 mr-2" />
                         Meta <span className="font-bold">Blog</span>
@@ -39,7 +39,7 @@ const NavbarSt = () => {
                 </button>
                 <div className="flex ml-auto gap-15">
                     <button onClick={() => navigate('/')}
-                        className={`font-medium transition-all duration-300 hover:-translate-y-0.5
+                        className={`font-medium transition-all duration-500 hover:-translate-y-0.5
       ${isDarkmodeActive
                                 ? 'text-gray-200 hover:text-indigo-400'
                                 : 'text-gray-700 hover:text-indigo-500'
@@ -49,7 +49,7 @@ const NavbarSt = () => {
                     </button>
 
                     <button onClick={() => navigate('/writeBlog')}
-                        className={`font-medium transition-all duration-300 hover:-translate-y-0.5
+                        className={`font-medium transition-all duration-500 hover:-translate-y-0.5
       ${isDarkmodeActive
                                 ? 'text-gray-200 hover:text-indigo-400'
                                 : 'text-gray-700 hover:text-indigo-500'
@@ -58,7 +58,7 @@ const NavbarSt = () => {
                         Write a Blog
                     </button>
                     <button onClick={() => navigate('/myBlogs')}
-                        className={`font-medium transition-all duration-300 hover:-translate-y-0.5
+                        className={`font-medium transition-all duration-500 hover:-translate-y-0.5
       ${isDarkmodeActive
                                 ? 'text-gray-200 hover:text-indigo-400'
                                 : 'text-gray-700 hover:text-indigo-500'
@@ -68,7 +68,7 @@ const NavbarSt = () => {
                     </button>
 
                     <button
-                        className={`font-medium transition-all duration-300 hover:-translate-y-0.5
+                        className={`font-medium transition-all duration-500 hover:-translate-y-0.5
                             ${isDarkmodeActive
                                 ? 'text-gray-200 hover:text-indigo-400'
                                 : 'text-gray-700 hover:text-indigo-500'
@@ -82,12 +82,12 @@ const NavbarSt = () => {
                         type="text"
                         placeholder="Type something..."
                         className={`
-                                w-full h-9 pl-3 pr-10 rounded-lg border border-gray-300 
+                                w-full h-9 pl-3 pr-10 rounded-lg border border-gray-500 
                                 focus:outline-none focus:ring-2 focus:ring-indigo-500
                                 transition-all duration-500 placeholder-gray-400
                             ${isDarkmodeActive
                                 ? 'bg-gray-800 text-gray-100 border-gray-600 placeholder-gray-500 focus:ring-indigo-400'
-                                : 'bg-white text-gray-900 border-gray-300 placeholder-gray-400 focus:ring-indigo-500'
+                                : 'bg-white text-gray-900 border-gray-500 placeholder-gray-400 focus:ring-indigo-500'
                             }
                     `}
                     />
@@ -105,7 +105,7 @@ const NavbarSt = () => {
                                     transition-all duration-500
                             ${isDarkmodeActive
                                 ? 'bg-gray-700 hover:bg-gray-600 shadow-md shadow-gray-900 hover:shadow-lg hover:shadow-black'
-                                : 'bg-gray-300 hover:bg-gray-400 shadow-md shadow-gray-600 hover:shadow-lg hover:shadow-gray-700'
+                                : 'bg-gray-500 hover:bg-gray-400 shadow-md shadow-gray-600 hover:shadow-lg hover:shadow-gray-700'
                             }`}
                     >
                         <img
@@ -121,7 +121,7 @@ const NavbarSt = () => {
                     </button>
                 </div>
                 <button
-                    className={`w-25 h-9 px-4 rounded-lg transition-all duration-300 shadow-md
+                    className={`w-25 h-9 px-4 rounded-lg transition-all duration-500 shadow-md
                         ${isDarkmodeActive
                             ? 'bg-gray-700 text-gray-100 hover:bg-gray-600 hover:scale-105 hover:shadow-lg'
                             : 'bg-indigo-500 text-white hover:bg-indigo-600 hover:scale-105 hover:shadow-lg'

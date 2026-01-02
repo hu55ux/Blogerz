@@ -1,13 +1,14 @@
 import React from 'react'
-import Footer from './components/Footer.jsx'
-import NavbarSt from './components/NavbarSt.jsx'
+import Login from './pages/Login.jsx'
+import Register from './pages/Register.jsx'
+
 
 const App = () => {
     return (
         <div className='w-full mx-auto'>
             <div className='max-w-360 mx-auto'>
-                <NavbarSt />
-                <Footer />
+                <Register />
+
             </div>
         </div>
     )
