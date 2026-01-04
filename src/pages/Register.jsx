@@ -6,7 +6,7 @@ import { useDarkmode } from '../stores/darkmodeStore';
 
 const Register = () => {
     const { isDarkmodeActive } = useDarkmode();
-    const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", password: "" });
+    const [formData, setFormData] = useState({ firstname: "", lastname: "", email: "", password: "" });
 
     const handleInputChange = (title, value) => {
         setFormData(prevState => ({
@@ -60,7 +60,7 @@ const Register = () => {
                             }`}
                     >
                         <input
-                            onChange={(e) => handleInputChange("firstName", e.target.value)}
+                            onChange={(e) => handleInputChange("firstname", e.target.value)}
                             type="text"
                             placeholder="Enter your first name"
                             className={`w-full h-19 px-4 text-sm
@@ -71,7 +71,7 @@ const Register = () => {
                                 } `}
                         />
                         <input
-                            onChange={(e) => handleInputChange("lastName", e.target.value)}
+                            onChange={(e) => handleInputChange("lastname", e.target.value)}
                             type="text"
                             placeholder="Enter your last name"
                             className={`w-full h-19 px-4 text-sm

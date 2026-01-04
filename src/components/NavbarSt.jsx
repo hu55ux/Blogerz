@@ -15,11 +15,10 @@ const NavbarSt = () => {
 
     return (
         <div
-            className={`w-full h-81 flex flex-col items-center justify-start px-4 transition-all duration-500
-        ${isDarkmodeActive ? 'bg-gray-900' : 'bg-white'}`}
+            className={`w-full h-50 pt-5 flex flex-col items-center justify-start px-4 transition-all duration-500`}
         >
             <div
-                className={`w-full max-w-360 mx-auto  h-9 py-8 font-light flex items-center rounded-md text-lg transition-all duration-500
+                className={`w-full max-w-360 mx-auto px-25 h-9 py-8 font-light flex items-center rounded-md text-lg transition-all duration-500
           ${isDarkmodeActive ? 'bg-gray-900 text-gray-100' : 'bg-white text-gray-900'}`}
             >
                 <button onClick={() => navigate('/')}
