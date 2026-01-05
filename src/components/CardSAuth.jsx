@@ -1,10 +1,47 @@
 import React from "react";
 import { useDarkmode } from "../stores/darkmodeStore";
+import { useTokens } from "../stores/tokenStore.js";
+import api from "../utils/axios.js";
 import { useNavigate } from "react-router-dom";
 
-const CardS = ({ blog = {} }) => {
+const CardS = ({ blog = {}, refreshAuthorBlogs }) => {
     // const navigate = useNavigate();
     const { isDarkmodeActive } = useDarkmode();
+    const { accessToken, refreshToken, setAccessToken } = useTokens();
+
+    const refreshTokens = async () => {
+        try {
+            const { data } = await api.post('/auth/refresh', { refreshToken });
+            setAccessToken(data.accessToken);
+            return data.accessToken;
+        } catch (error) {
+            console.error("Refresh failed", error.response?.data || error.message);
+            return null;
+        }
+    };
+
+    const handleDelete = async () => {
+        let token = accessToken;
+        if (!token && refreshToken) {
+            token = await refreshTokens();
+            if (!token) {
+                alert("Session expired. Please log in again.");
+                return;
+            }
+        }
+        try {
+            const { data } = await api.delete(`/blogs/${blog._id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            alert("Blog deleted successfully.");
+            if (refreshAuthorBlogs) refreshAuthorBlogs();
+        } catch (error) {
+            console.error("Delete failed", error.response?.data || error.message);
+            alert("Failed to delete the blog.");
+        }
+    }
 
     const capitalize = (text = "") =>
         typeof text === "string"
@@ -30,11 +67,20 @@ const CardS = ({ blog = {} }) => {
         >
             <div
                 // onClick={() => navigate(`/blog/${blog._id}`)}
-                className={`w-98 h-145 transition-all duration-500 cursor-pointer hover:scale-[1.02] flex flex-col pt-4 rounded-2xl shadow-md ${isDarkmodeActive
+                className={`w-98 h-145 relative transition-all duration-500 cursor-pointer hover:scale-[1.02] flex flex-col pt-4 rounded-2xl shadow-md ${isDarkmodeActive
                     ? "bg-gray-800 text-gray-100"
                     : "bg-white text-gray-900"
                     }`}
             >
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation(); // klik blog açılmasını dayandırır
+                        handleDelete();
+                    }}
+                    className="absolute top-4 right-4 bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600"
+                >
+                    Remove
+                </button>
                 <img
                     className="w-90 h-60 rounded-2xl mx-4 object-cover"
                     src={blog?.image || null}

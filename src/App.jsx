@@ -8,6 +8,10 @@ import CardL from './components/CardL.jsx'
 import CardS from './components/CardS.jsx'
 import api from './utils/axios.js'
 import Blogs from './pages/Blogs.jsx'
+import BlogDetails from './pages/BlogDetails.jsx'
+import AuthorPage from './pages/AuthorPage.jsx'
+import CreateBlog from './pages/CreateBlog.jsx'
+import DropDownMenu from './components/DropDownMenu.jsx'
 
 
 const App = () => {
@@ -15,8 +19,12 @@ const App = () => {
     return (
         <div className='w-full mx-auto'>
             <div className='max-w-360 mx-auto'>
-                <Blogs />
-
+                {/* <Blogs /> */}
+                <AuthorPage />
+                {/* <NavbarSt /> */}
+                {/* <Login /> */}
+                {/* <CreateBlog /> */}
+                {/* <DropDownMenu />     */}
 
             </div>
         </div>

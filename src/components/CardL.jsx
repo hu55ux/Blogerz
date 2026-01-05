@@ -29,7 +29,7 @@ const CardL = ({ blog }) => {
                 ${isDarkmodeActive ? 'bg-gray-900' : 'bg-white'}`}
         >
             <div
-                className='w-304 h-113 rounded-2xl bg-cover flex justify-center items-end shadow-lg transition-all duration-500'
+                className='w-304 h-113 cursor-pointer hover:scale-[1.02] rounded-2xl overflow-hidden bg-cover flex justify-center items-end shadow-lg transition-all duration-500'
                 style={{
                     backgroundImage: `url(${blog.image})`,
                     filter: isDarkmodeActive ? 'brightness(0.7)' : 'brightness(1)',
@@ -51,7 +51,7 @@ const CardL = ({ blog }) => {
                     </h1>
 
                     <div
-                        className={`flex text-xl gap-5 pt-5 transition-all duration-500
+                        className={`flex text-xl gap-5 mt-auto transition-all duration-500
                             ${isDarkmodeActive ? 'text-gray-300' : 'text-white'}`}
                     >
                         <h1>{blog.user?.email}</h1>

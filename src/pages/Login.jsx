@@ -8,7 +8,7 @@ import Footer from '../components/Footer.jsx';
 
 const Login = () => {
     const { isDarkmodeActive } = useDarkmode();
-    const { accessToken, refreshToken, setAccesToken, setRefreshToken } = useTokens();
+    const { accessToken, refreshToken, setAccessToken, setRefreshToken } = useTokens();
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [message, setMessage] = useState("");
 
@@ -38,7 +38,7 @@ const Login = () => {
                 return;
             }
         }
-        navigate("/register");
+        // navigate("/register");
     };
 
 
@@ -51,11 +51,9 @@ const Login = () => {
             );
 
             if (status === 200 && data?.accessToken) {
-                setAccesToken(data.accessToken);
-                setRefreshToken(data.refreshToken);
+                setAccessToken(data.accessToken);
                 return true;
             }
-
             return false;
         } catch (error) {
             console.error("Refresh failed", error);
@@ -72,13 +70,15 @@ const Login = () => {
             })
             if (statusText === "OK") {
                 console.log(data);
-                setAccesToken(data.accessToken);
+                setAccessToken(data.accessToken);
                 setRefreshToken(data.refreshToken);
             }
         } catch (error) {
-
+            console.error("Login failed", error.response?.data || error.message);
+            showMessage("Login failed: " + (error.response?.data?.message || error.message));
         }
     }
+
     return (
         <div className='relative'>
             {message && (

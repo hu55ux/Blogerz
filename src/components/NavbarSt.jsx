@@ -7,30 +7,61 @@ import SearchBlack from '../assets/SearchBlack.svg'
 import SearchWhite from '../assets/SearchWhite.svg'
 import { useDarkmode } from '../stores/darkmodeStore'
 import { useNavigate } from "react-router-dom"
+import api from '../utils/axios.js'
+import { useTokens } from '../stores/tokenStore.js'
 
 
-const NavbarSt = () => {
+const NavbarSt = ({ searchTerm, onSearchChange }) => {
     const { isDarkmodeActive, toggleDarkmode } = useDarkmode()
-    // const navigate = useNavigate()
+    const { accessToken, refreshToken, setAccessToken } = useTokens();
 
+    const refreshTokens = async () => {
+        try {
+            const data = await api.post('/auth/refresh', { refreshToken });
+            setAccessToken(data.accessToken);
+            console.log(data, 'Tokens refreshed successfully');
+            return data.accessToken;
+        } catch (error) {
+            console.error('Failed to refresh tokens:', error.response?.data || error.message);
+            return null;
+        }
+    }
+
+    const handleSignIn = async () => {
+        if (accessToken) {
+            alert('You are already logged in.');
+            return;
+        }
+
+        if (!accessToken && refreshToken) {
+            const newAccessToken = await refreshTokens();
+            if (newAccessToken) {
+                alert('You are already logged in.');
+                return;
+            }
+        }
+
+        alert('You need to log in.');
+        // navigate('/login');
+    }
     return (
         <div
             className={`w-full h-50 pt-5 flex flex-col items-center justify-start px-4 transition-all duration-500`}
         >
             <div
                 className={`w-full max-w-360 mx-auto px-25 h-9 py-8 font-light flex items-center rounded-md text-lg transition-all duration-500
-          ${isDarkmodeActive ? 'bg-gray-900 text-gray-100' : 'bg-white text-gray-900'}`}
+                        ${isDarkmodeActive ? 'bg-gray-900 text-gray-100' : 'bg-white text-gray-900'}`}
             >
                 <button onClick={() => navigate('/')}
                     className={`font-medium transition-all duration-500 hover:-translate-y-0.5
-    ${isDarkmodeActive
+                        ${isDarkmodeActive
                             ? 'text-gray-200 hover:text-indigo-400'
                             : 'text-gray-700 hover:text-indigo-500'
                         }`}
                 >
                     <div
                         className={`pl-2 pr-10 flex items-center border-r-2 mr-6 transition-all duration-500
-      ${isDarkmodeActive ? 'border-gray-600' : 'border-gray-500'}`}
+                        ${isDarkmodeActive ? 'border-gray-600' : 'border-gray-500'}`}
                     >
                         <img src={isDarkmodeActive ? UnionWhite : Union} alt="Union Logo" className="w-6 h-6 mr-2" />
                         Meta <span className="font-bold">Blog</span>
@@ -39,7 +70,7 @@ const NavbarSt = () => {
                 <div className="flex ml-auto gap-15">
                     <button onClick={() => navigate('/')}
                         className={`font-medium transition-all duration-500 hover:-translate-y-0.5
-      ${isDarkmodeActive
+                            ${isDarkmodeActive
                                 ? 'text-gray-200 hover:text-indigo-400'
                                 : 'text-gray-700 hover:text-indigo-500'
                             }`}
@@ -49,7 +80,7 @@ const NavbarSt = () => {
 
                     <button onClick={() => navigate('/writeBlog')}
                         className={`font-medium transition-all duration-500 hover:-translate-y-0.5
-      ${isDarkmodeActive
+                            ${isDarkmodeActive
                                 ? 'text-gray-200 hover:text-indigo-400'
                                 : 'text-gray-700 hover:text-indigo-500'
                             }`}
@@ -58,7 +89,7 @@ const NavbarSt = () => {
                     </button>
                     <button onClick={() => navigate('/myBlogs')}
                         className={`font-medium transition-all duration-500 hover:-translate-y-0.5
-      ${isDarkmodeActive
+                            ${isDarkmodeActive
                                 ? 'text-gray-200 hover:text-indigo-400'
                                 : 'text-gray-700 hover:text-indigo-500'
                             }`}
@@ -80,6 +111,8 @@ const NavbarSt = () => {
                     <input
                         type="text"
                         placeholder="Type something..."
+                        value={searchTerm}
+                        onChange={(e) => onSearchChange(e.target.value)}
                         className={`
                                 w-full h-9 pl-3 pr-10 rounded-lg border border-gray-500 
                                 focus:outline-none focus:ring-2 focus:ring-indigo-500
@@ -120,6 +153,7 @@ const NavbarSt = () => {
                     </button>
                 </div>
                 <button
+                    onClick={handleSignIn}
                     className={`w-25 h-9 px-4 rounded-lg transition-all duration-500 shadow-md
                         ${isDarkmodeActive
                             ? 'bg-gray-700 text-gray-100 hover:bg-gray-600 hover:scale-105 hover:shadow-lg'
@@ -129,7 +163,6 @@ const NavbarSt = () => {
                 >
                     Sign In
                 </button>
-
             </div>
         </div>
     )

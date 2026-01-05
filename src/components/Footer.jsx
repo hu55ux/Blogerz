@@ -11,7 +11,7 @@ const Footer = () => {
     const getCategories = async () => {
         try {
             const { data, statusText } = await api.get('/blogs/categories');
-            console.log(data);
+
             if (statusText === 'OK') {
                 setCategories(data);
             }
@@ -24,10 +24,14 @@ const Footer = () => {
         getCategories();
     }, []);
 
-    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+    const capitalize = (text = "") =>
+        typeof text === "string"
+            ? text.charAt(0).toUpperCase() + text.slice(1)
+            : "";
+
 
     return (
-        <div className={`w-full h-105 pt-16 overflow-hidden transition-all duration-500  ${isDarkmodeActive ? 'bg-gray-900 text-gray-100' : 'bg-gray-200 text-gray-900'}`}>
+        <div className={`w-full h-105 mt-10 pt-16 overflow-hidden transition-all duration-500  ${isDarkmodeActive ? 'bg-gray-900 text-gray-100' : 'bg-gray-200 text-gray-900'}`}>
             <div className='max-w-360 mx-auto px-35'>
                 <div className='flex gap-16'>
                     <div className='w-70 h-59'>
