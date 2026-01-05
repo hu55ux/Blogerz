@@ -5,88 +5,92 @@ import { useDarkmode } from '../stores/darkmodeStore.js';
 import Footer from '../components/Footer.jsx';
 import { useParams } from 'react-router-dom';
 
-
 const BlogDetails = () => {
-    const [blog, setBlog] = useState([]);
-    const [productLimit, setProductLimit] = useState(10);
+    const [blog, setBlog] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const { isDarkmodeActive } = useDarkmode();
     const { blogId } = useParams();
 
-
-    const getProductById = async (search = "") => {
+    const getBlogById = async () => {
         try {
-            
+            const { data } = await api.get(`/blogs/blog/${blogId}`);
+            setBlog(data);
         } catch (error) {
-            
+            console.error("Error fetching blog:", error.message);
         }
     };
 
+    // Axtarış funksiyası (əgər bu səhifədə lazımdırsa)
     const handleSearchChange = (value) => {
         setSearchTerm(value);
-        getProducts(value);
+        // Burada axtarış məntiqi və ya ana səhifəyə yönləndirmə ola bilər
     }
 
     const capitalize = (text = "") =>
-        typeof text === "string"
-            ? text.charAt(0).toUpperCase() + text.slice(1)
-            : "";
+        text ? text.charAt(0).toUpperCase() + text.slice(1) : "";
 
     const formatDate = (dateString) => {
         if (!dateString) return "—";
-        const date = new Date(dateString);
-        return isNaN(date)
-            ? "—"
-            : new Intl.DateTimeFormat("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-            }).format(date);
+        return new Date(dateString).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
     };
 
     useEffect(() => {
-        getProducts();
-    }, []);
+        if (blogId) getBlogById();
+    }, [blogId]);
+
+    if (!blog) return <div className="h-screen flex items-center justify-center">Loading...</div>;
 
     return (
-        <div className={`w-full min-h-screen flex flex-col transition-all duration-500 ${isDarkmodeActive ? 'bg-gray-900' : 'bg-white'
+        <div className={`w-full min-h-screen transition-all duration-500 ${isDarkmodeActive ? 'bg-gray-900 text-gray-100' : 'bg-white text-gray-900'
             }`}>
-            <div className='max-w-360 w-full'>
-                <NavbarSt searchTerm={searchTerm} onSearchChange={handleSearchChange} />
-                <div className='grow w-full flex justify-center transition-all duration-500'>
-                    <div className={`w-200 bg-gray-900 transition-all duration-500 ${isDarkmodeActive ? 'bg-gray-900' : 'bg-white'
+            <NavbarSt searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+
+            <main className="max-w-4xl mx-auto px-4 py-10">
+                <div className="flex mb-6">
+                    <span className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors ${isDarkmodeActive ? "bg-indigo-500/20 text-indigo-400" : "bg-indigo-100 text-indigo-700"
                         }`}>
-                        <h1
-                            className={`w-30 h-10 ml-4 mt-5 mb-3 transition-all duration-500 flex justify-center items-center rounded-md text-lg font-medium ${isDarkmodeActive
-                                ? "bg-gray-700 text-cyan-400"
-                                : "bg-gray-200 text-cyan-800"
-                                }`}
-                        >
-                            {capitalize(blogs[0]?.category)}
-                        </h1>
-                        <h1 className="ml-2 text-5xl font-semibold">
-                            {capitalize(blogs[0]?.title)}
-                        </h1>
-                        <div className=" flex gap-5 ml-4 mt-auto mb-5 transition-all duration-500 text-md font-light">
-                            <h1 className={isDarkmodeActive ? "text-gray-300" : "text-gray-700"}>
-                                {blogs[0]?.user?.email || "—"}
-                            </h1>
-                            <h1 className={isDarkmodeActive ? "text-gray-300" : "text-gray-700"}>
-                                {formatDate(blogs[0]?.createdAt)}
-                            </h1>
+                        {capitalize(blog.category)}
+                    </span>
+                </div>
+
+                <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-6">
+                    {capitalize(blog.title)}
+                </h1>
+
+                <div className="flex items-center gap-4 mb-8 opacity-70 text-sm md:text-base">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center text-white text-xs">
+                            {blog.user?.email.charAt(0).toUpperCase()}
                         </div>
-                        <img src={blogs[0]?.image} alt={blogs[0]?.title} className='w-200 h-116 rounded-lg' />
-                        <p className={`mt-5 mb-10 px-4 text-2xl leading-8 ${isDarkmodeActive ? 'text-gray-300' : 'text-gray-900'}`}>
-                            {blogs[0]?.description}
-                        </p>
+                        <span className="font-medium">{blog.user?.email}</span>
                     </div>
+                    <span>•</span>
+                    <span>{formatDate(blog.createdAt)}</span>
                 </div>
-                <div>
-                    <Footer />
+
+                <div className="w-full mb-10 overflow-hidden rounded-2xl shadow-2xl">
+                    <img
+                        src={blog.image}
+                        alt={blog.title}
+                        className="w-full h-auto object-cover max-h-125"
+                    />
                 </div>
-            </div>
+
+                <article className={`prose prose-lg max-w-none transition-colors ${isDarkmodeActive ? 'prose-invert text-gray-300' : 'text-gray-800'
+                    }`}>
+                    <p className="text-xl leading-relaxed whitespace-pre-wrap">
+                        {blog.description}
+                    </p>
+                </article>
+            </main>
+
+            <Footer />
         </div>
     )
 }
 
-export default BlogDetails
+export default BlogDetails;

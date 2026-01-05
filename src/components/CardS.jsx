@@ -1,15 +1,12 @@
 import React from "react";
 import { useDarkmode } from "../stores/darkmodeStore";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const CardS = ({ blog = {} }) => {
-    // const navigate = useNavigate();
     const { isDarkmodeActive } = useDarkmode();
 
     const capitalize = (text = "") =>
-        typeof text === "string"
-            ? text.charAt(0).toUpperCase() + text.slice(1)
-            : "";
+        typeof text === "string" ? text.charAt(0).toUpperCase() + text.slice(1) : "";
 
     const formatDate = (dateString) => {
         if (!dateString) return "—";
@@ -24,46 +21,44 @@ const CardS = ({ blog = {} }) => {
     };
 
     return (
-        <div
-            className={`w-full h-160 flex transition-all duration-500 justify-center items-center ${isDarkmodeActive ? "bg-gray-900" : "bg-white"
-                }`}
+        <Link
+            to={`/details/${blog._id}`}
+            className={`group w-full flex flex-col h-full rounded-2xl shadow-md transition-all duration-500 overflow-hidden
+            ${isDarkmodeActive ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"} border`}
         >
-            <div
-                // onClick={() => navigate(`/blog/${blog._id}`)}
-                className={`w-98 h-145 transition-all duration-500 cursor-pointer hover:scale-[1.02] flex flex-col pt-4 rounded-2xl shadow-md ${isDarkmodeActive
-                    ? "bg-gray-800 text-gray-100"
-                    : "bg-white text-gray-900"
-                    }`}
-            >
+            <div className="relative overflow-hidden aspect-video">
                 <img
-                    className="w-90 h-60 rounded-2xl mx-4 object-cover"
-                    src={blog?.image || null}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    src={blog?.image || "https://via.placeholder.com/400x250"}
                     alt={blog?.title || "blog image"}
                 />
+            </div>
 
-                <h1
-                    className={`w-25 h-7 ml-5 mt-5 mb-3 transition-all duration-500 flex justify-center items-center rounded-md text-sm font-medium ${isDarkmodeActive
-                        ? "bg-gray-700 text-cyan-400"
-                        : "bg-gray-200 text-cyan-800"
-                        }`}
-                >
-                    {capitalize(blog?.category)}
-                </h1>
+            <div className="flex flex-col grow p-4 md:p-5">
+                <div className="flex mb-3">
+                    <span
+                        className={`px-3 py-1 rounded-md text-xs sm:text-sm font-semibold transition-all duration-500
+                        ${isDarkmodeActive ? "bg-gray-700 text-cyan-400" : "bg-cyan-50 text-cyan-700"}`}
+                    >
+                        {capitalize(blog?.category)}
+                    </span>
+                </div>
 
-                <h1 className="ml-5 text-3xl font-semibold">
+                <h1 className={`text-lg sm:text-xl font-bold mb-4 line-clamp-2 transition-all duration-500
+                    ${isDarkmodeActive ? "text-gray-100" : "text-gray-900"}`}>
                     {capitalize(blog?.title)}
                 </h1>
 
-                <div className="flex gap-5 ml-4 mt-auto mb-5 transition-all duration-500 text-sm font-light">
-                    <h1 className={isDarkmodeActive ? "text-gray-300" : "text-gray-700"}>
-                        {blog?.user?.email || "—"}
-                    </h1>
-                    <h1 className={isDarkmodeActive ? "text-gray-300" : "text-gray-700"}>
+                <div className="mt-auto pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-gray-700/10 dark:border-gray-100/10 text-xs sm:text-sm">
+                    <span className={`font-medium truncate max-w-37.5 ${isDarkmodeActive ? "text-gray-400" : "text-gray-500"}`}>
+                        {blog?.user?.email?.split('@')[0] || "User"}
+                    </span>
+                    <span className={isDarkmodeActive ? "text-gray-500" : "text-gray-400"}>
                         {formatDate(blog?.createdAt)}
-                    </h1>
+                    </span>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 };
 

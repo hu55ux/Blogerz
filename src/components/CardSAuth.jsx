@@ -1,116 +1,100 @@
 import React from "react";
 import { useDarkmode } from "../stores/darkmodeStore";
-import { useTokens } from "../stores/tokenStore.js";
 import api from "../utils/axios.js";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const CardS = ({ blog = {}, refreshAuthorBlogs }) => {
-    // const navigate = useNavigate();
+const CardSAuth = ({ blog = {}, refreshAuthorBlogs }) => {
     const { isDarkmodeActive } = useDarkmode();
-    const { accessToken, refreshToken, setAccessToken } = useTokens();
+    const navigate = useNavigate();
 
-    const refreshTokens = async () => {
-        try {
-            const { data } = await api.post('/auth/refresh', { refreshToken });
-            setAccessToken(data.accessToken);
-            return data.accessToken;
-        } catch (error) {
-            console.error("Refresh failed", error.response?.data || error.message);
-            return null;
-        }
-    };
+    const handleDelete = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
 
-    const handleDelete = async () => {
-        let token = accessToken;
-        if (!token && refreshToken) {
-            token = await refreshTokens();
-            if (!token) {
-                alert("Session expired. Please log in again.");
-                return;
-            }
-        }
+        if (!window.confirm("Are you sure you want to delete this blog?")) return;
+
         try {
-            const { data } = await api.delete(`/blogs/${blog._id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            await api.delete(`/blogs/${blog._id}`);
             alert("Blog deleted successfully.");
             if (refreshAuthorBlogs) refreshAuthorBlogs();
         } catch (error) {
             console.error("Delete failed", error.response?.data || error.message);
-            alert("Failed to delete the blog.");
+            if (error.response?.status === 401) {
+                alert("Session expired. Please log in again.");
+                navigate("/login");
+            } else {
+                alert("Failed to delete the blog.");
+            }
         }
-    }
+    };
 
     const capitalize = (text = "") =>
-        typeof text === "string"
-            ? text.charAt(0).toUpperCase() + text.slice(1)
-            : "";
+        typeof text === "string" ? text.charAt(0).toUpperCase() + text.slice(1) : "";
 
     const formatDate = (dateString) => {
         if (!dateString) return "—";
         const date = new Date(dateString);
-        return isNaN(date)
-            ? "—"
-            : new Intl.DateTimeFormat("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-            }).format(date);
+        return isNaN(date) ? "—" : new Intl.DateTimeFormat("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        }).format(date);
     };
 
     return (
-        <div
-            className={`w-full h-160 flex transition-all duration-500 justify-center items-center ${isDarkmodeActive ? "bg-gray-900" : "bg-white"
-                }`}
-        >
-            <div
-                // onClick={() => navigate(`/blog/${blog._id}`)}
-                className={`w-98 h-145 relative transition-all duration-500 cursor-pointer hover:scale-[1.02] flex flex-col pt-4 rounded-2xl shadow-md ${isDarkmodeActive
-                    ? "bg-gray-800 text-gray-100"
-                    : "bg-white text-gray-900"
-                    }`}
+        <div className="relative group w-full h-full">
+            {/* Silmə Düyməsi - Link-in üzərində müstəqil durur */}
+            <button
+                onClick={handleDelete}
+                className=
+                "absolute top-4 right-4 z-20 bg-red-500/90 hover:bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg transition-all duration-300 opacity-0 group-hover:opacity-100 transform -translate-y-1.25 group-hover:translate-y-0"
             >
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation(); // klik blog açılmasını dayandırır
-                        handleDelete();
-                    }}
-                    className="absolute top-4 right-4 bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600"
-                >
-                    Remove
-                </button>
-                <img
-                    className="w-90 h-60 rounded-2xl mx-4 object-cover"
-                    src={blog?.image || null}
-                    alt={blog?.title || "blog image"}
-                />
+                Remove
+            </button>
 
-                <h1
-                    className={`w-25 h-7 ml-5 mt-5 mb-3 transition-all duration-500 flex justify-center items-center rounded-md text-sm font-medium ${isDarkmodeActive
-                        ? "bg-gray-700 text-cyan-400"
-                        : "bg-gray-200 text-cyan-800"
-                        }`}
-                >
-                    {capitalize(blog?.category)}
-                </h1>
-
-                <h1 className="ml-5 text-3xl font-semibold">
-                    {capitalize(blog?.title)}
-                </h1>
-
-                <div className="flex gap-5 ml-4 mt-auto mb-5 transition-all duration-500 text-sm font-light">
-                    <h1 className={isDarkmodeActive ? "text-gray-300" : "text-gray-700"}>
-                        {blog?.user?.email || "—"}
-                    </h1>
-                    <h1 className={isDarkmodeActive ? "text-gray-300" : "text-gray-700"}>
-                        {formatDate(blog?.createdAt)}
-                    </h1>
+            <Link
+                to={`/details/${blog._id}`}
+                className={`flex flex-col h-full rounded-2xl shadow-md transition-all duration-500 overflow-hidden border
+                ${isDarkmodeActive
+                        ? "bg-gray-800 border-gray-700 text-gray-100 hover:bg-gray-750"
+                        : "bg-white border-gray-100 text-gray-900 hover:shadow-xl"}`}
+            >
+                {/* Şəkil Hissəsi */}
+                <div className="aspect-video w-full overflow-hidden">
+                    <img
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        src={blog?.image || "https://via.placeholder.com/400x250"}
+                        alt={blog?.title || "blog image"}
+                    />
                 </div>
-            </div>
+
+                {/* Məzmun Hissəsi */}
+                <div className="flex flex-col grow p-5">
+                    {/* Kateqoriya */}
+                    <div className="flex mb-3">
+                        <span
+                            className={`px-3 py-1 rounded-md text-xs font-semibold transition-all duration-500
+                            ${isDarkmodeActive ? "bg-gray-700 text-cyan-400" : "bg-cyan-50 text-cyan-700"}`}
+                        >
+                            {capitalize(blog?.category)}
+                        </span>
+                    </div>
+
+                    {/* Başlıq - 3-lü grid üçün text ölçüsü optimallaşdırıldı */}
+                    <h1 className="text-xl md:text-2xl font-bold mb-4 line-clamp-2 leading-tight">
+                        {capitalize(blog?.title)}
+                    </h1>
+
+                    {/* Alt Məlumatlar */}
+                    <div className={`mt-auto pt-4 flex flex-col gap-1 border-t border-gray-700/10 dark:border-gray-100/10 text-xs sm:text-sm
+                        ${isDarkmodeActive ? "text-gray-400" : "text-gray-500"}`}>
+                        <span className="truncate font-medium">{blog?.user?.email}</span>
+                        <span>{formatDate(blog?.createdAt)}</span>
+                    </div>
+                </div>
+            </Link>
         </div>
     );
 };
 
-export default CardS;
+export default CardSAuth;

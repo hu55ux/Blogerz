@@ -1,136 +1,149 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import axios from '../utils/axios';
-import NavbarLog from '../components/NavbarLog.jsx'
-import Footer from '../components/Footer.jsx'
+import NavbarLog from '../components/NavbarLog.jsx';
+import Footer from '../components/Footer.jsx';
 import { useDarkmode } from '../stores/darkmodeStore';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+    const navigate = useNavigate();
     const { isDarkmodeActive } = useDarkmode();
     const [formData, setFormData] = useState({ firstname: "", lastname: "", email: "", password: "" });
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleInputChange = (title, value) => {
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
         setFormData(prevState => ({
             ...prevState,
-            [title]: value
-        }))
-    }
+            [name]: value
+        }));
+    };
 
-    const registerHandling = async () => {
+    const registerHandling = async (e) => {
+        e.preventDefault();
+
+        if (!formData.firstname || !formData.lastname || !formData.email || !formData.password) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        setIsLoading(true);
         try {
-            const response = await axios.post("/auth/register", formData, {
-                headers: { 'Content-Type': 'application/json' }
-            });
+            const response = await axios.post("/auth/register", formData);
 
             if (response.status === 200 || response.status === 201) {
-                console.log("Registered successfully", response.data);
                 alert("Registered successfully!");
+                navigate("/login");
             }
-
         } catch (error) {
-            // Serverdən gələn cavab varsa
-            if (error.response) {
-                console.error("Server error:", error.response);
-                alert(error.response.data?.message || "Server error occurred. Try again.");
-            } else if (error.request) {
-                // Sorğu göndərildi, cavab gəlmədi
-                console.error("No response received:", error.request);
-                alert("No response from server. Check your network.");
-            } else {
-                // Digər xətalar
-                console.error("Error:", error.message);
-                alert("An error occurred: " + error.message);
-            }
+            const errorMsg = error.response?.data?.message || "An error occurred during registration.";
+            alert(errorMsg);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <div className={`w-full min-h-screen flex flex-col transition-all duration-500  ${isDarkmodeActive ? 'bg-gray-900 text-gray-100' : ' text-gray-900'}`} >
-            <div className='w-full max-w-360 mx-auto flex flex-col grow'>
-                <NavbarLog />
-                <div className='h-18 font-bold transition-all duration-500 text-6xl flex justify-center'>Login</div>
-                <div
-                    className={`w-full h-190 flex items-center justify-center transition-all duration-500
-                        ${isDarkmodeActive ? 'bg-gray-900' : 'bg-white'}`}
-                >
-                    <div
-                        className={`w-200 h-100 border flex flex-col gap-6 justify-start transition-all duration-500
-                            ${isDarkmodeActive
-                                ? 'bg-gray-800 border-gray-700 '
-                                : 'bg-white border-gray-200 '
-                            }`}
-                    >
-                        <input
-                            onChange={(e) => handleInputChange("firstname", e.target.value)}
-                            type="text"
-                            placeholder="Enter your first name"
-                            className={`w-full h-19 px-4 text-sm
-                                focus:outline-none focus:ring-2 transition-all duration-500
-                                ${isDarkmodeActive
-                                    ? 'bg-gray-700 text-gray-100 placeholder-gray-400 focus:ring-indigo-400'
-                                    : 'bg-gray-100 text-gray-900 placeholder-gray-500 focus:ring-indigo-500'
-                                } `}
-                        />
-                        <input
-                            onChange={(e) => handleInputChange("lastname", e.target.value)}
-                            type="text"
-                            placeholder="Enter your last name"
-                            className={`w-full h-19 px-4 text-sm
-                                focus:outline-none focus:ring-2 transition-all duration-500
-                                ${isDarkmodeActive
-                                    ? 'bg-gray-700 text-gray-100 placeholder-gray-400 focus:ring-indigo-400'
-                                    : 'bg-gray-100 text-gray-900 placeholder-gray-500 focus:ring-indigo-500'
-                                } `}
-                        />
-                        <input
-                            onChange={(e) => handleInputChange("email", e.target.value)}
-                            type="email"
-                            placeholder="Enter your email"
-                            className={`w-full h-19 px-4 text-sm
-                                focus:outline-none focus:ring-2 transition-all duration-500
-                                ${isDarkmodeActive
-                                    ? 'bg-gray-700 text-gray-100 placeholder-gray-400 focus:ring-indigo-400'
-                                    : 'bg-gray-100 text-gray-900 placeholder-gray-500 focus:ring-indigo-500'
-                                } `}
-                        />
+        <div className={`w-full min-h-screen flex flex-col transition-all duration-500 ${isDarkmodeActive ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'
+            }`}>
+            <NavbarLog />
 
-                        <input
-                            onChange={(e) => handleInputChange("password", e.target.value)}
-                            type="password"
-                            placeholder="Enter your password"
-                            className={`w-full h-19 px-4 text-sm transition-all duration-500
-                                focus:outline-none focus:ring-2
-                                ${isDarkmodeActive
-                                    ? 'bg-gray-700 text-gray-100 placeholder-gray-400 focus:ring-indigo-400'
-                                    : 'bg-gray-100 text-gray-900 placeholder-gray-500 focus:ring-indigo-500'
-                                }`}
-                        />
+            <main className="grow flex items-center justify-center px-4 py-12">
+                <div className="w-full max-w-lg space-y-8">
 
-                        <button
-                            className="text-indigo-500 text-sm text-left hover:underline transition-all duration-500"
-                        >
-                            Already have an account?
-                        </button>
+                    <div className="text-center">
+                        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Join Us</h1>
+                        <p className="opacity-60 mt-2 text-lg">Create an account to start blogging</p>
+                    </div>
 
-                        <button
-                            onClick={registerHandling}
-                            className={`w-full h-25 mt-auto font-semibold text-lg transition-all duration-500
-                                ${isDarkmodeActive
-                                    ? 'bg-indigo-500 hover:bg-indigo-600 text-white shadow-md shadow-indigo-900/40'
-                                    : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md'
-                                }`}
-                        >
-                            Register
-                        </button>
+                    <div className={`p-8 md:p-10 rounded-3xl shadow-2xl transition-all border ${isDarkmodeActive ? 'bg-gray-800 border-gray-700 shadow-black/20' : 'bg-white border-gray-100'
+                        }`}>
+                        <form className="space-y-5" onSubmit={registerHandling}>
+
+                            {/* Ad və Soyad yan-yana */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium ml-1 opacity-70">First Name</label>
+                                    <input
+                                        name="firstname"
+                                        onChange={handleInputChange}
+                                        type="text"
+                                        placeholder="John"
+                                        className={`w-full h-12 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all ${isDarkmodeActive
+                                            ? 'bg-gray-900 border-gray-700 focus:ring-indigo-500 placeholder-gray-600'
+                                            : 'bg-gray-50 border-gray-200 focus:ring-indigo-400 placeholder-gray-400'
+                                            }`}
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium ml-1 opacity-70">Last Name</label>
+                                    <input
+                                        name="lastname"
+                                        onChange={handleInputChange}
+                                        type="text"
+                                        placeholder="Doe"
+                                        className={`w-full h-12 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all ${isDarkmodeActive
+                                            ? 'bg-gray-900 border-gray-700 focus:ring-indigo-500 placeholder-gray-600'
+                                            : 'bg-gray-50 border-gray-200 focus:ring-indigo-400 placeholder-gray-400'
+                                            }`}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-1">
+                                <label className="text-sm font-medium ml-1 opacity-70">Email Address</label>
+                                <input
+                                    name="email"
+                                    onChange={handleInputChange}
+                                    type="email"
+                                    placeholder="john@example.com"
+                                    className={`w-full h-12 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all ${isDarkmodeActive
+                                        ? 'bg-gray-900 border-gray-700 focus:ring-indigo-500 placeholder-gray-600'
+                                        : 'bg-gray-50 border-gray-200 focus:ring-indigo-400 placeholder-gray-400'
+                                        }`}
+                                />
+                            </div>
+
+                            <div className="space-y-1">
+                                <label className="text-sm font-medium ml-1 opacity-70">Password</label>
+                                <input
+                                    name="password"
+                                    onChange={handleInputChange}
+                                    type="password"
+                                    placeholder="••••••••"
+                                    className={`w-full h-12 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all ${isDarkmodeActive
+                                        ? 'bg-gray-900 border-gray-700 focus:ring-indigo-500 placeholder-gray-600'
+                                        : 'bg-gray-50 border-gray-200 focus:ring-indigo-400 placeholder-gray-400'
+                                        }`}
+                                />
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => navigate("/login")}
+                                className="text-indigo-500 text-sm font-medium hover:underline block"
+                            >
+                                Already have an account?
+                            </button>
+
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className={`w-full h-14 mt-4 rounded-xl font-bold text-lg shadow-lg transition-all transform active:scale-95 disabled:opacity-50 ${isDarkmodeActive
+                                    ? 'bg-indigo-500 hover:bg-indigo-600 text-white shadow-indigo-900/20'
+                                    : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200'
+                                    }`}
+                            >
+                                {isLoading ? "Creating account..." : "Register"}
+                            </button>
+                        </form>
                     </div>
                 </div>
-                <div className='mt-auto'>
-                    <Footer />
-                </div>
+            </main>
 
+            <Footer />
+        </div>
+    );
+};
 
-            </div>
-        </div >
-    )
-}
-
-export default Register
+export default Register;

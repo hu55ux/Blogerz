@@ -35,49 +35,55 @@ const DropDownMenu = ({ isDarkmodeActive, value = "All", onChange = () => { } })
     }, [value]);
 
     return (
-        <div className="relative w-64" onMouseLeave={() => setIsOpen(false)}>
+        <div
+            className="relative w-full sm:w-60 md:w-72"
+            onMouseLeave={() => setIsOpen(false)}
+        >
             <button
                 onClick={() => setIsOpen(prev => !prev)}
                 onMouseEnter={() => setIsOpen(true)}
-                className={`w-183 h-20 px-4 rounded-lg border focus:outline-none focus:ring-2 flex justify-between items-center font-medium transition-all duration-500 ${isDarkmodeActive
-                    ? "bg-gray-700 text-gray-100 hover:bg-gray-700"
-                    : "bg-white text-gray-400 hover:bg-gray-300"
-                    }`}
+                className={`w-full h-12 px-4 rounded-xl border-2 flex justify-between items-center font-semibold transition-all duration-300
+                    ${isDarkmodeActive
+                        ? "bg-gray-800 border-gray-700 text-gray-100 hover:border-cyan-500 focus:ring-cyan-500"
+                        : "bg-white border-gray-100 text-gray-600 hover:border-cyan-400 focus:ring-cyan-400"
+                    } focus:outline-none focus:ring-2`}
             >
-                {selected ? capitalize(selected) : "Select Category"}
-                <span className={`transform transition-transform duration-500 ${isOpen ? "rotate-180" : ""}`}>
+                <span className="truncate">
+                    {selected ? capitalize(selected) : "Select Category"}
+                </span>
+                <span className={`ml-2 transform transition-transform duration-300 ${isOpen ? "rotate-180 text-cyan-500" : ""}`}>
                     ▼
                 </span>
             </button>
 
             {isOpen && (
                 <ul
-                    className={`absolute z-50 mt-2 w-full rounded-lg overflow-hidden shadow-lg transition-all duration-500 ${isDarkmodeActive
-                        ? "bg-gray-700 text-gray-100 shadow-gray-900"
-                        : "bg-white text-gray-900 shadow-gray-300"
+                    className={`absolute z-50 mt-2 w-full rounded-xl overflow-hidden shadow-2xl border transition-all duration-300
+                        ${isDarkmodeActive
+                            ? "bg-gray-800 border-gray-700 text-gray-100"
+                            : "bg-white border-gray-100 text-gray-700"
                         }`}
                 >
                     <li
                         onClick={() => handleSelect("All")}
-                        className={`px-4 py-2 cursor-pointer transition-all duration-500 ${selected === null
-                            ? isDarkmodeActive
-                                ? "bg-gray-700"
-                                : "bg-gray-100"
-                            : ""
-                            } hover:${isDarkmodeActive ? "bg-gray-700" : "bg-gray-100"}`}
+                        className={`px-4 py-3 cursor-pointer text-sm font-medium transition-colors
+                            ${selected === null
+                                ? "bg-cyan-500/10 text-cyan-500"
+                                : isDarkmodeActive ? "hover:bg-gray-700" : "hover:bg-gray-50"
+                            }`}
                     >
-                        All
+                        All Categories
                     </li>
+
                     {categories.map((category) => (
                         <li
                             key={category}
                             onClick={() => handleSelect(category)}
-                            className={`w-150 px-4 py-2 cursor-pointer transition-all duration-500 ${selected === category
-                                ? isDarkmodeActive
-                                    ? "bg-gray-700"
-                                    : "bg-gray-100"
-                                : ""
-                                } hover:${isDarkmodeActive ? "bg-gray-700" : "bg-gray-100"}`}
+                            className={`px-4 py-3 cursor-pointer text-sm font-medium transition-colors border-t border-gray-100/5
+                                ${selected === category
+                                    ? "bg-cyan-500/10 text-cyan-500"
+                                    : isDarkmodeActive ? "hover:bg-gray-700" : "hover:bg-gray-50"
+                                }`}
                         >
                             {capitalize(category)}
                         </li>

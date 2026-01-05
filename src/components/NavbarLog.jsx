@@ -1,103 +1,104 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Union from '../assets/Union.svg'
 import UnionWhite from '../assets/Union-White.svg'
 import Light from '../assets/Light.svg'
 import Night from '../assets/Night.svg'
 import { useDarkmode } from '../stores/darkmodeStore'
 import { useNavigate } from "react-router-dom"
+import { useTokens } from '../stores/tokenStore.js'
 
 const NavbarLog = () => {
+    const { accessToken } = useTokens()
     const { isDarkmodeActive, toggleDarkmode } = useDarkmode()
-    // const navigate = useNavigate()
+    const navigate = useNavigate()
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const navLinks = [
+        { name: 'Home', path: '/' },
+        { name: 'Write a Blog', path: '/create', auth: true },
+        { name: 'My Blogs', path: '/author', auth: true },
+        { name: 'Contact', path: '/contact', auth: false },
+    ];
+
+    const handleNavigation = (path, requiresAuth) => {
+        if (requiresAuth && !accessToken) {
+            alert(`You need to log in to access this page.`);
+            return;
+        }
+        navigate(path);
+        setIsMenuOpen(false);
+    };
 
     return (
-        <div className={`w-full h-81 py-5 flex flex-col items-center px-4 transition-all duration-500
-            ${isDarkmodeActive ? 'bg-gray-900' : 'bg-white'}`}>
+        <nav className={`w-full sticky top-0 z-50 transition-all duration-500 border-b ${isDarkmodeActive ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'
+            }`}>
+            <div className="max-w-7xl mx-auto mb-15 px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between items-center h-20">
 
-            <div
-                className='w-full flex justify-center max-w-360 mx-auto px-28'
-            >
-                <div
-                    className={`w-200 h-9 font-light flex items-center rounded-md text-lg transition-all duration-500
-                    ${isDarkmodeActive ? 'bg-gray-900 text-gray-100' : 'bg-white text-gray-900'}`}
-                >
-                    <button onClick={() => navigate('/')}
-                        className={`font-medium transition-all duration-500 hover:-translate-y-0.5
-                        ${isDarkmodeActive
-                                ? 'text-gray-200 hover:text-indigo-400'
-                                : 'text-gray-700 hover:text-indigo-500'
-                            }`}
-                    >
-                        <div
-                            className={`pl-2 pr-10 flex items-center border-r-2 mr-6 transition-all duration-500
-                            ${isDarkmodeActive ? 'border-gray-600' : 'border-gray-500'}`}
-                        >
-                            <img src={isDarkmodeActive ? UnionWhite : Union} alt="Union Logo" className="w-6 h-6 mr-2" />
+                    <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
+                        <img
+                            src={isDarkmodeActive ? UnionWhite : Union}
+                            alt="Logo"
+                            className="w-8 h-8 mr-2"
+                        />
+                        <span className={`text-xl font-medium ${isDarkmodeActive ? 'text-white' : 'text-gray-900'}`}>
                             Meta <span className="font-bold">Blog</span>
-                        </div>
-                    </button>
-                    <div className="flex gap-10">
-                        <button onClick={() => navigate('/')}
-                            className={`font-medium transition-all duration-500 hover:-translate-y-0.5
-                            ${isDarkmodeActive
-                                    ? 'text-gray-200 hover:text-indigo-400'
-                                    : 'text-gray-700 hover:text-indigo-500'
-                                }`}
-                        >
-                            Home
-                        </button>
-                        <button onClick={() => navigate('/writeBlog')}
-                            className={`font-medium transition-all duration-500 hover:-translate-y-0.5
-                            ${isDarkmodeActive
-                                    ? 'text-gray-200 hover:text-indigo-400'
-                                    : 'text-gray-700 hover:text-indigo-500'
-                                }`}
-                        >
-                            Write a Blog
-                        </button>
-                        <button onClick={() => navigate('/myBlogs')}
-                            className={`font-medium transition-all duration-500 hover:-translate-y-0.5
-                            ${isDarkmodeActive
-                                    ? 'text-gray-200 hover:text-indigo-400'
-                                    : 'text-gray-700 hover:text-indigo-500'
-                                }`}
-                        >
-                            My Blogs
-                        </button>
-                        <button
-                            className={`font-medium transition-all duration-500 hover:-translate-y-0.5
-                            ${isDarkmodeActive
-                                    ? 'text-gray-200 hover:text-indigo-400'
-                                    : 'text-gray-700 hover:text-indigo-500'
-                                }`}
-                        >
-                            Contact
-                        </button>
+                        </span>
                     </div>
-                    <div className="ml-auto flex items-center gap-2 pr-10">
+
+                    <div className="hidden md:flex items-center gap-8">
+                        {navLinks.map((link) => (
+                            <button
+                                key={link.name}
+                                onClick={() => handleNavigation(link.path, link.auth)}
+                                className={`font-medium transition-all duration-300 hover:-translate-y-0.5 ${isDarkmodeActive ? 'text-gray-300 hover:text-cyan-400' : 'text-gray-600 hover:text-cyan-600'
+                                    }`}
+                            >
+                                {link.name}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="flex items-center gap-4">
                         <button
                             onClick={toggleDarkmode}
-                            className={`rounded-2xl w-9 h-8 flex justify-center items-center
-                            transition-all duration-500 
-                            ${isDarkmodeActive
-                                    ? 'bg-gray-700 hover:bg-gray-600 shadow-md shadow-gray-900 hover:shadow-lg hover:shadow-black'
-                                    : 'bg-gray-500 hover:bg-gray-400 shadow-md shadow-gray-600 hover:shadow-lg hover:shadow-gray-700'
+                            className={`p-2 rounded-xl transition-all duration-500 ${isDarkmodeActive ? 'bg-gray-800 text-yellow-400' : 'bg-gray-100 text-gray-600'
                                 }`}
                         >
                             <img
                                 src={isDarkmodeActive ? Night : Light}
                                 alt="theme icon"
-                                className={`w-5 h-5 transition-all duration-500
-                                ${isDarkmodeActive
-                                        ? 'rotate-180 scale-110 opacity-100'
-                                        : 'rotate-0 scale-100 opacity-90'
-                                    }`}
+                                className="w-5 h-5"
                             />
+                        </button>
+
+                        <button
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            className="md:hidden p-2"
+                        >
+                            <div className={`w-6 h-0.5 mb-1.5 transition-all ${isDarkmodeActive ? 'bg-white' : 'bg-gray-900'} ${isMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></div>
+                            <div className={`w-6 h-0.5 mb-1.5 ${isDarkmodeActive ? 'bg-white' : 'bg-gray-900'} ${isMenuOpen ? 'opacity-0' : ''}`}></div>
+                            <div className={`w-6 h-0.5 ${isDarkmodeActive ? 'bg-white' : 'bg-gray-900'} ${isMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></div>
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <div className={`md:hidden transition-all duration-300 overflow-hidden ${isMenuOpen ? 'max-h-64 border-t border-gray-100/10' : 'max-h-0'}`}>
+                <div className={`px-4 pt-2 pb-6 space-y-2 ${isDarkmodeActive ? 'bg-gray-900' : 'bg-white'}`}>
+                    {navLinks.map((link) => (
+                        <button
+                            key={link.name}
+                            onClick={() => handleNavigation(link.path, link.auth)}
+                            className={`block w-full text-left px-3 py-3 rounded-lg font-medium ${isDarkmodeActive ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-50'
+                                }`}
+                        >
+                            {link.name}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </nav>
     )
 }
 

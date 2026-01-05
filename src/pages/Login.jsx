@@ -1,169 +1,134 @@
-import React from 'react'
+import React, { useState } from 'react';
 import axios from 'axios';
-import { useState } from 'react';
-import NavbarLog from '../components/NavbarLog.jsx'
+import NavbarLog from '../components/NavbarLog.jsx';
 import { useDarkmode } from '../stores/darkmodeStore';
 import { useTokens } from '../stores/tokenStore';
 import Footer from '../components/Footer.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+    const navigate = useNavigate();
     const { isDarkmodeActive } = useDarkmode();
     const { accessToken, refreshToken, setAccessToken, setRefreshToken } = useTokens();
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [message, setMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const showMessage = (messageText) => {
         setMessage(messageText);
-        setTimeout(() => {
-            setMessage("");
-        }, 2500);
+        setTimeout(() => setMessage(""), 3000);
     }
 
-    const handleInputChange = (title, value) => {
-        setFormData(prevState => ({
-            ...prevState,
-            [title]: value
-        }))
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
     }
 
-    const handleRegister = async () => {
-        if (accessToken && refreshToken) {
-            showMessage("You are already logged in!");
+    const handleLogin = async (e) => {
+        e.preventDefault(); // Formun refresh olmasının qarşısını alırıq
+        if (!formData.email || !formData.password) {
+            showMessage("Please fill in all fields.");
             return;
         }
-        if (!accessToken && refreshToken) {
-            const refreshed = await refreshTokens();
-            if (refreshed) {
-                showMessage("You are already logged in!");
-                return;
-            }
-        }
-        // navigate("/register");
-    };
 
-
-    const refreshTokens = async () => {
+        setIsLoading(true);
         try {
-            const { data, status } = await axios.post(
-                "https://ilkinibadov.com/api/b/auth/refresh",
-                { refreshToken },
-                { headers: { 'Content-Type': 'application/json' } }
-            );
+            const { data } = await axios.post("https://ilkinibadov.com/api/b/auth/login", formData);
 
-            if (status === 200 && data?.accessToken) {
-                setAccessToken(data.accessToken);
-                return true;
-            }
-            return false;
-        } catch (error) {
-            console.error("Refresh failed", error);
-            return false;
-        }
-    };
+            setAccessToken(data.accessToken);
+            setRefreshToken(data.refreshToken);
+            showMessage("Login successful!");
 
-    const handleLogin = async () => {
-        try {
-            const { data, statusText } = await axios.post("https://ilkinibadov.com/api/b/auth/login", formData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            if (statusText === "OK") {
-                console.log(data);
-                setAccessToken(data.accessToken);
-                setRefreshToken(data.refreshToken);
-            }
+            setTimeout(() => navigate("/"), 500);
         } catch (error) {
-            console.error("Login failed", error.response?.data || error.message);
-            showMessage("Login failed: " + (error.response?.data?.message || error.message));
+            showMessage(error.response?.data?.message || "Login failed");
+        } finally {
+            setIsLoading(false);
         }
     }
 
     return (
-        <div className='relative'>
+        <div className={`min-h-screen flex flex-col transition-all duration-500 ${isDarkmodeActive ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'
+            }`}>
             {message && (
-                <div
-                    className={`fixed top-6 right-6 px-5 py-3 rounded-lg shadow-lg z-50
-                                transition-all duration-500
-                            ${isDarkmodeActive
-                            ? 'bg-gray-800 text-white'
-                            : 'bg-white text-gray-900'
-                        }`}
-                >
+                <div className={`fixed top-10 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl z-50 animate-bounce transition-all ${isDarkmodeActive ? 'bg-indigo-500 text-white' : 'bg-gray-800 text-white'
+                    }`}>
                     {message}
                 </div>
             )}
 
+            <NavbarLog />
 
-            <div className={`w-full min-h-screen flex flex-col transition-all duration-500  ${isDarkmodeActive ? 'bg-gray-900 text-gray-100' : ' text-gray-900'}`}>
-                <div className='w-full max-w-360 mx-auto flex flex-col grow'>
-                    <NavbarLog />
-                    <div className='h-18 font-bold transition-all duration-500 text-6xl flex justify-center'>Login</div>
-                    <div
-                        className={`w-full h-190 flex items-center justify-center transition-all duration-500
-                        ${isDarkmodeActive ? 'bg-gray-900' : 'bg-white'}`}
-                    >
-                        <div
-                            className={`w-200 h-85 border flex flex-col gap-6 justify-start transition-all duration-500
-                            ${isDarkmodeActive
-                                    ? 'bg-gray-800 border-gray-700 '
-                                    : 'bg-white border-gray-200 '
-                                }`}
-                        >
-                            <input
-                                value={formData.email}
-                                onChange={(e) => handleInputChange("email", e.target.value)}
-                                type="email"
-                                placeholder="Enter your email"
-                                className={`w-full h-19 px-4 text-sm
-                                focus:outline-none focus:ring-2 transition-all duration-500
-                                ${isDarkmodeActive
-                                        ? 'bg-gray-700 text-gray-100 placeholder-gray-400 focus:ring-indigo-400'
-                                        : 'bg-gray-100 text-gray-900 placeholder-gray-500 focus:ring-indigo-500'
-                                    } `}
-                            />
+            <main className="grow flex items-center justify-center px-4 py-12">
+                <div className="w-full max-w-md space-y-8">
 
-                            <input
-                                value={formData.password}
-                                onChange={(e) => handleInputChange("password", e.target.value)}
-                                type="password"
-                                placeholder="Enter your password"
-                                className={`w-full h-19 px-4 text-sm transition-all duration-500
-                                focus:outline-none focus:ring-2
-                                ${isDarkmodeActive
-                                        ? 'bg-gray-700 text-gray-100 placeholder-gray-400 focus:ring-indigo-400'
-                                        : 'bg-gray-100 text-gray-900 placeholder-gray-500 focus:ring-indigo-500'
-                                    }`}
-                            />
-
-                            <button
-                                onClick={handleRegister}
-                                className="text-indigo-500 text-sm text-left hover:underline transition-all duration-500"
-                            >
-                                Don’t have an account?
-                            </button>
-
-                            <button
-                                onClick={handleLogin}
-                                className={`w-full h-25 mt-auto font-semibold text-lg transition-all duration-500
-                                ${isDarkmodeActive
-                                        ? 'bg-indigo-500 hover:bg-indigo-600 text-white shadow-md shadow-indigo-900/40'
-                                        : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md'
-                                    }`}
-                            >
-                                Login
-                            </button>
-                        </div>
-                    </div>
-                    <div className='mt-auto'>
-                        <Footer />
+                    <div className="text-center">
+                        <h1 className="text-5xl font-extrabold mb-2 tracking-tight">Welcome</h1>
+                        <p className="opacity-60 text-lg">Please login to your account</p>
                     </div>
 
+                    <div className={`p-8 rounded-3xl shadow-xl transition-all border ${isDarkmodeActive ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'
+                        }`}>
+                        <form className="space-y-6" onSubmit={handleLogin}>
+                            <div>
+                                <label className="block text-sm font-medium mb-2 ml-1">Email Address</label>
+                                <input
+                                    name="email"
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    placeholder="name@example.com"
+                                    className={`w-full h-12 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all ${isDarkmodeActive
+                                        ? 'bg-gray-900 border-gray-700 focus:ring-indigo-500 placeholder-gray-600'
+                                        : 'bg-gray-50 border-gray-200 focus:ring-indigo-400 placeholder-gray-400'
+                                        }`}
+                                />
+                            </div>
 
+                            <div>
+                                <label className="block text-sm font-medium mb-2 ml-1">Password</label>
+                                <input
+                                    name="password"
+                                    type="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    placeholder="••••••••"
+                                    className={`w-full h-12 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all ${isDarkmodeActive
+                                        ? 'bg-gray-900 border-gray-700 focus:ring-indigo-500 placeholder-gray-600'
+                                        : 'bg-gray-50 border-gray-200 focus:ring-indigo-400 placeholder-gray-400'
+                                        }`}
+                                />
+                            </div>
+
+                            <div className="flex justify-between items-center text-sm">
+                                <button
+                                    type="button"
+                                    onClick={() => navigate("/register")}
+                                    className="text-indigo-500 hover:text-indigo-400 font-medium transition-colors"
+                                >
+                                    Create account?
+                                </button>
+                                <span className="opacity-50">Forgot password?</span>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className={`w-full h-14 rounded-xl font-bold text-lg shadow-lg transition-all transform active:scale-95 ${isDarkmodeActive
+                                    ? 'bg-indigo-500 hover:bg-indigo-600 text-white shadow-indigo-900/20'
+                                    : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200'
+                                    } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                                {isLoading ? "Checking..." : "Login"}
+                            </button>
+                        </form>
+                    </div>
                 </div>
-            </div>
-        </div>
-    )
-}
+            </main>
 
-export default Login
+            <Footer />
+        </div>
+    );
+};
+
+export default Login;
